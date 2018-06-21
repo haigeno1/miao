@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ios-checkbox</title>
+  <style type="text/css">
+    div {
+      width: 72px;
+      height: 36px;
+      box-sizing: border-box;
+      background-color: grey;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    input {
+      display: none;
+    }
+
+    span {
+      width: 32px;
+      height: 32px;
+      display: block;
+      background-color: white;
+      margin-top: 2px;
+      margin-left: 3px;
+      border-radius: 50px;
+    }
+
+    input:checked+label div {
+      background-color: green;
+    }
+
+    input:checked+label div span {
+      margin-left: 37px;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+  <input type="checkbox" id="ff">
+  <label for="ff">
+    <div>
+      <span></span>
+    </div>
+  </label>
+</body>
+</html>
