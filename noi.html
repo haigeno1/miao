@@ -24,20 +24,19 @@
 <script type="text/javascript" id="ch0103/04">
   var a = +prompt("a:")
   var b = +prompt("b:") 
-  var c = parseInt(a / b)
-  console.log(c, a - b * c) 
+  console.log(parseInt(a / b) + ' ' + a % b)
 </script>
 
 <script id="ch0103/05">
   var a = +prompt("a:")
   var b = +prompt("b:") 
-  console.log(a / b)  
+  console.log((a / b).toFixed(9))
 </script>
 
 <script id="ch0103/06">
   var a = +prompt("a:")
   var b = +prompt("b:") 
-  console.log(a / b)   
+  console.log((b / a * 100).toFixed(3) + '%')
 </script>
 
 
@@ -55,15 +54,14 @@
 <script id="ch0103/08">
   var f = +prompt("f:")
   var c = 5 * (f-32) / 9
-  console.log(c)
+  console.log((5 * (f - 32) / 9).toFixed(5))
+
 </script>
 
 
 <script id="ch0103/09">
   var r = +prompt("r:")
-  console.log(r * 2)
-  console.log(2 * Math.PI * r)
-  console.log(Math.PI * r * r)
+  console.log((2 * r).toFixed(4) + ' ' + (2 * 3.14159 * r).toFixed(4) + ' ' + ( 3.14159 * r * r).toFixed(4))
 </script>
 
 
@@ -71,12 +69,16 @@
   var a = +prompt("a:")
   var b = +prompt("b:")  
   var r = 1/((1 / a) + (1 / b))
-  console.log(r)
+  console.log(r.toFixed(2))
 </script>
 
 
 <script id="ch0103/11">
-  
+  var a = +prompt()
+  var b = +prompt()
+  var k = parseInt(a / b)
+  var r = a - (k * b)
+  console.log(r.toFixed(4))  
 </script>
 
 
@@ -105,7 +107,7 @@
   var a = "h:"
   var b = "r:"
   var v = 3.14159 * r * r * h
-  var n = 1000 / v
+  var n = Math.ceil(1000 / v)
   console.log(n)
 </script>
 
@@ -142,7 +144,7 @@
   var l3 = Math.sqrt((x1 - x3) ** 2 + (y1 - y3) ** 2)
   var s = (l1 + l2 + l3) / 2
   var a = Math.sqrt(s * (s - a) * (s - b) * (s - c))
-  console.log(s)
+  console.log(a.toFixed(2))
 </script>
 
 
@@ -240,7 +242,7 @@
 
 <script id="ch0104/08">
   var a = +prompt()
-  if (n % 15 == 0) {
+  if (n % 15 === 0) {
     console.log('YES')
   } else {
     console.log('NO')
@@ -321,8 +323,10 @@
 <script id="ch0104/14">
   var a = +prompt()
   var b = +prompt()
-  var p = 0
-  p += Math.ceil(p / 500)
+  var p = 8
+  if (a > 1000){
+    p += Math.ceil((a - 1000) / 500)
+  }
   if (b == 'y') {
     p += 5
   }  
@@ -387,8 +391,8 @@
 <script id="ch0104/19">
   var a = +prompt()
   var b = +prompt()
-  var t = +prompt()
-  if (t !== ('+' | '-' | '*' | '/')){
+  var t = prompt()
+  if (t != '+' && t != '-'  && t != '*' && t !='/'){
     console.log('Invalid operator!')
   } else if (t == '/' && b == 0){
     console.log('Divided by zero!')
@@ -434,6 +438,17 @@
 </script>
 
 
+
+<script id="ch0104/21">
+  var n = +prompt();
+  var x = +prompt();
+  var y = +prompt();
+  var s = parseInt(n - y / x)
+  if (s < 0) {
+    s = 0
+  }
+  console.log(s)
+</script> 
 
 
 
@@ -705,6 +720,7 @@
   for (var i = 1; i <= 9; i++){
     s10 += h * ( 0.5 ** i * 2)
   }
-  console.log (s10 + ' ' + h10)
+  console.log (s10)
+  console.log (h10)
 </script>
 
