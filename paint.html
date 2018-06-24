@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>画图</title>
+  <style>
+    canvas {
+      border: 2px solid #f0f;
+      display: block;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+  <canvas width="400" height="300"></canvas>
+</body>
+<script>
+  var cvs = document.querySelector('canvas')
+  var ctx = cvs.getContext('2d')
+
+  function dot(x, y, color = 'black') {
+    ctx.fillStyle = color
+    ctx.fillRect(x, y, 1, 1)
+  }
+</script>
+<script>
+  // YOUR CODE GOES HERE
+  for (var a = 0; a < 400; a++){
+    dot(a, 10)
+  }
+  for (var b = 0; b < 400; b++){
+    if (b % 2 == 0){
+      dot(b, 20)
+    }
+  }
+  for (var c = 0; c < 400; c++){
+    if (c % 4 ==0 || (c - 1) % 4 == 0){
+      dot(c, 30)
+    }
+  }
+  for (var d = 0; d < 400; d++){
+    if (d % 5 == 0 || (d - 1) % 5 == 0 || (d - 2) % 5 == 0){
+      dot(d, 40)
+    }
+  }
+
+  for (var i = 0; i < 400; i++){
+    dot(i, i)
+  }
+  for (var j = 0; j < 400; j++){
+    dot(j, 299 / 399 * j)
+  }
+
+  for (var mx = 150; mx < 200; mx++){
+    for (var my = 150; my < 200; my++){
+      dot(mx, my)
+    }
+  }
+  for (var mx = 200; mx < 250; mx++){
+    for (var my = 200; my < 250; my++){
+      dot(mx, my, rgb(255, 255 - 5 * (my - 200), 5 * (mx - 200) ) )
+    }
+  }  
+  for (var n = 0; n < 360; n++){
+    dot(100 + Math.sin(n * Math.PI / 180) * 50, 100 + Math.cos(n * Math.PI / 180) * 50 )
+  }
+
+
+</script>
+</html>
