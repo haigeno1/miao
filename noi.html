@@ -724,3 +724,38 @@
   console.log (h10)
 </script>
 
+
+<script  xtype="xx" id="dichotomy-my-first">
+  debugger
+  var n = +prompt()
+
+  if (n >= 1){
+    var low = 0
+    var high = n
+    var x = (low + high) / 2
+    while(Math.abs(x * x - n) > 0.000001){
+      x = (low + high) / 2
+      if (x * x > n){
+        high = x
+      } else {
+        low = x 
+      }
+    }
+    console.log(x)
+  }  else {
+      var low = n
+      var high = 1
+      var x = (low + high) / 2    
+      while(Math.abs(x * x - n) > 0.000001){
+        x = (low + high) / 2
+        if (x * x > n){
+          high = x
+        } else {
+          low = x 
+      }
+    }
+    console.log(x)    
+  }
+
+</script>
+
