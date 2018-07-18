@@ -17,6 +17,19 @@ var haigeno1 = {
     return res
   },
 
+  concat:function(array,...values){
+    var res = array.slice()
+    for (var item of values) {
+        if (Array.isArray(item)) res.push(...item)
+        else res.push(item)
+    }
+    return res
+  },
+
+  join:function(){
+
+  },
+
   difference: function(array,...values){
     var res = []
     var newValues = [].concat(...values)
@@ -31,7 +44,7 @@ var haigeno1 = {
   differenceBy: function(array,values,iteratee=_.identity){
     var prep = _.iteratee(iteratee)
     var values2 = values.map(i => prep(i))
-    return array.filter(j => values2.includes(prep(j)))
+    return array.filter(j => !values2.includes(prep(j)))
   },
 
   differenceWith: function(array, values, comparator){
@@ -54,7 +67,7 @@ var haigeno1 = {
         return false
       }
     }
-  return true 
+    return true 
   },
 
   identity:function(...values){
@@ -62,7 +75,6 @@ var haigeno1 = {
   },
 
   drop:function(array,n=1) {
-    var n = n || 1
     var res = []
     for (var i = n; i < array.length; i++){
       res.push(array[i])
@@ -71,7 +83,6 @@ var haigeno1 = {
   },
 
   dropRight:function(array,n=1){
-    var n = n || 1
     var res = []
     for (var i = 0; i < array.length - n; i++){
       res.push(array[i])
@@ -80,10 +91,30 @@ var haigeno1 = {
   },
 
   dropWhile:function(array, predicate=_.identity) {
-    for (var i = 0; i < array.length; i++){
-      if (!predicate(array[i])){
-        break
+    if (typeof predicate === "function"){
+      for (var i = 0; i < array.length; i++){
+        if (!predicate(array[i])){
+          break
+        }
       }
+    } else if(Array.isArray(predicate)){
+      for (var i = 0; i < array.length; i++){
+          if (!(array[i] === predicate[0])) {
+            break
+        }
+      }
+    } else if (typeof predicate === "string"){
+      for (var i = 0; i < array.length; i++){
+        if (array[predicate[0]] !== predicate[1]){
+          break
+        }
+      }
+    } else if (typeof predicate === "object"){
+      for (var i = 0; i < array.length; i++){
+        if (!isEqual(array[i], predicate)){
+          break
+        }
+      }      
     }
     var res = []
     for (var j = i; j < array.length; j++){
@@ -99,21 +130,126 @@ var haigeno1 = {
     return array
   },
 
+  fill:function(array,value,start=0,end=array.length){
+    return array.reduce(function(result, item, index, ary) {
+      if (index >= start && index < end){
+        result.push(value)
+      }
+      return result
+    }, [])    
+  },
+
   flatten:function(array){
     var res = [],t = 0
     for(var i = 0; i < array.length; i++){
-      if (!isArray[i]){
+      if (!Array.isArray(array[i])){
         res[t++] = array[i]
       } else {
-        for (var j = 0; j < res[i].length; j++){
-          res[t++] = res[i][j]
+        for (var j = 0; j < array[i].length; j++){
+          res[t++] = array[i][j]
         }
       }
     }
+    return res    
+  },
+
+  flattenDeep:function(array){
+    var res = [],t = 0
+    for(var i = 0; i < array.length; i++){
+      flatten(array[i])
+    }
+    return res    
+  },
+
+  flattenDepth:function(array, depth=1){
+    var tmp = array
+    while(deepth--){
+      var tmp = flatten(tmp)
+    }
+    return tmp
+  },
+
+  cloneDeep:function(){
+
+  },
+
+  map2:function (array,mapper){
+    var res = []
+    for (var i = 0; i < array.length; i++){
+      res.push(mapper(array[i]))
+    }
     return res
-  }
+  },
 
+  map:function(array, mapper) {
+    return array.reduce(function(result, item, index, ary) {
+      result.push(mapper(item, index, ary))
+      return result
+    }, [])
+  },
 
+  reduce:function(array,reducer,initialValue){
+    var res = initialValue
+    for (var i = 0; i < array.length; i++){
+      res = reducer(res,array[i])
+    }
+    return res
+  },
+
+  filter:function(array,test){
+    return array.reduce((result, item, index, ary) => {
+      if (test(item, index, ary)) {
+        result.push(item)
+      }
+      return result
+    }, [])
+  },
+
+  forEach:function(array,action){
+    for (var i = 0; i < array.length; i++){
+      action(array[i])
+    }
+  },
+
+  slice:function(array, start=0, end=array.length){
+    var res = []
+    for (var i = start; i < end; i++){
+      res.push(array[i])
+    }
+    return res
+  },
+
+  add:function(){
+
+  },
+
+  indexOf:function(array, value, fromIndex = 0){
+    while (fromIndex < 0) {
+      fromIndex += array.length
+    }
+    for (var i = fromIndex; i < array.length; i++){
+      if (array[i] === value){
+        return i
+      }
+    }
+    return -1
+  },
+
+  lastIndexOf:function(array, value, fromIndex=array.length-1) {
+    while (fromIndex < 0) {
+      fromIndex += array.length
+    }
+    for (var i = array.length - fromIndex; i >= 0; i--){
+      if (array[i] === value){
+        return i
+      }
+    }
+    return -1    
+  },
+
+  split:function(string='', separator, limit){
+
+  },
 
 
 }
