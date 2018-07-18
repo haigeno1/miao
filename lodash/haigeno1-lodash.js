@@ -70,6 +70,50 @@ var haigeno1 = {
     return true 
   },
 
+  isEmpty:function(){
+
+  },
+
+  isNumber:function(){
+
+  },
+
+  isString:function(){
+
+  },
+
+  isFunction:function(){
+
+  },
+
+  isNaN:function(){
+
+  },
+
+  isNull:function(){
+
+  },
+
+  isObject:function(){
+
+  },
+
+  isNill:function(){
+
+  },
+
+  isUndefined:function(){
+
+  },
+
+  isArguments:function(){
+
+  },
+
+  isArray:function(){
+
+  },
+
   identity:function(...values){
     return values[0]
   },
@@ -99,19 +143,19 @@ var haigeno1 = {
       }
     } else if(Array.isArray(predicate)){
       for (var i = 0; i < array.length; i++){
-          if (!(array[i] === predicate[0])) {
+          if (array[i][predicate[0]] !== predicate[1]) {
             break
         }
       }
     } else if (typeof predicate === "string"){
       for (var i = 0; i < array.length; i++){
-        if (array[predicate[0]] !== predicate[1]){
+        if (!array[i][predicate]){
           break
         }
       }
     } else if (typeof predicate === "object"){
       for (var i = 0; i < array.length; i++){
-        if (!isEqual(array[i], predicate)){
+        if (!haigeno1.isEqual(array[i], predicate)){
           break
         }
       }      
@@ -134,6 +178,8 @@ var haigeno1 = {
     return array.reduce(function(result, item, index, ary) {
       if (index >= start && index < end){
         result.push(value)
+      } else{
+        result.push(array[index])
       }
       return result
     }, [])    
@@ -154,19 +200,44 @@ var haigeno1 = {
   },
 
   flattenDeep:function(array){
-    var res = [],t = 0
-    for(var i = 0; i < array.length; i++){
-      flatten(array[i])
+    var res = []
+    var flattenDeepTmp = function(arr){
+      for (var item of arr){
+        if (Array.isArray(item)){
+          flattenDeepTmp(item)
+        } else {
+          res.push(item)
+        }
+      }
     }
-    return res    
+    flattenDeepTmp(array)
+    return res
   },
 
   flattenDepth:function(array, depth=1){
     var tmp = array
-    while(deepth--){
-      var tmp = flatten(tmp)
+    while(depth--){
+      var tmp = haigeno1.flatten(tmp)
     }
     return tmp
+  },
+
+  head:function(array){
+    return array[0]
+  },
+
+  initial:function(array){
+    var res = array.slice()
+    res.pop()
+    return res
+  },
+
+  fromPairs:function(pairs){
+    var res = {}
+    for (var item of pairs){
+      res[item[0]] = item[1]
+    }
+    return res
   },
 
   cloneDeep:function(){
@@ -205,9 +276,17 @@ var haigeno1 = {
     }, [])
   },
 
-  forEach:function(array,action){
-    for (var i = 0; i < array.length; i++){
-      action(array[i])
+  forEach:function(collection, iteratee=_.identity){
+    if (Array.isArray(collection)){
+      for (var i = 0; i < array.length; i++){
+        action(array[i])
+      }
+      return collection
+    } else if (typeof collection === "object"){
+      for (var i in collection){
+        iteratee(i,collection[i])
+      }
+      return collection
     }
   },
 
@@ -219,7 +298,7 @@ var haigeno1 = {
     return res
   },
 
-  add:function(){
+  includes:function(){
 
   },
 
@@ -236,10 +315,10 @@ var haigeno1 = {
   },
 
   lastIndexOf:function(array, value, fromIndex=array.length-1) {
-    while (fromIndex < 0) {
+    if (fromIndex < 0) {
       fromIndex += array.length
     }
-    for (var i = array.length - fromIndex; i >= 0; i--){
+    for (var i = fromIndex; i >= 0; i--){
       if (array[i] === value){
         return i
       }
@@ -250,6 +329,8 @@ var haigeno1 = {
   split:function(string='', separator, limit){
 
   },
+
+
 
 
 }
