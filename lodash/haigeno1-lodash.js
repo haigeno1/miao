@@ -18,16 +18,12 @@ var haigeno1 = {
   },
 
   concat:function(array,...values){
-    var res = array.slice()
-    for (var item of values) {
+    var res = []
+    for (var item of arguments) {
         if (Array.isArray(item)) res.push(...item)
         else res.push(item)
     }
     return res
-  },
-
-  join:function(){
-
   },
 
   difference: function(array,...values){
@@ -58,7 +54,7 @@ var haigeno1 = {
     if(a == null || b == null || typeof(a) != "object" || typeof(b) != "object" ) {
       return false
     }
-    var keysA = Objects.keys(a),keysB = Objects.keys(b)
+    var keysA = Object.keys(a),keysB = Object.keys(b)
     if (keysA.length !== keysB.length){
       return false
     } 
@@ -94,8 +90,12 @@ var haigeno1 = {
 
   },
 
-  isObject:function(){
+  isObject:function(value){
+    return value !== null && typeof value === 'object' || typeof value === 'function'
+  },
 
+  isObject:function(value){
+  return value !== null && typeof value === 'object'
   },
 
   isNill:function(){
@@ -106,12 +106,12 @@ var haigeno1 = {
 
   },
 
-  isArguments:function(){
-
+  isArguments:function(value){
+    return Object.prototype.toString.call(value) === "[object Arguments]"
   },
 
-  isArray:function(){
-
+  isArray:function(x){
+    return Array.isArray(x)
   },
 
   identity:function(...values){
@@ -240,11 +240,22 @@ var haigeno1 = {
     return res
   },
 
+  toPairs:function(object){
+    var res = []
+    for (var key in object){
+      res.push([key,object[key]])
+    }
+    return res
+  },
+
   cloneDeep:function(){
 
   },
 
-  map2:function (array,mapper){
+  map:function (array,mapper){
+    if (typeof mapper == "string") {
+      mapper = haigeno1.property(mapper)
+    }
     var res = []
     for (var i = 0; i < array.length; i++){
       res.push(mapper(array[i]))
@@ -252,19 +263,25 @@ var haigeno1 = {
     return res
   },
 
-  map:function(array, mapper) {
-    return array.reduce(function(result, item, index, ary) {
+  map2:function(array, mapper) {
+    return Array.reduce(function(result, item, index, ary) {
       result.push(mapper(item, index, ary))
       return result
     }, [])
   },
 
-  reduce:function(array,reducer,initialValue){
-    var res = initialValue
-    for (var i = 0; i < array.length; i++){
-      res = reducer(res,array[i])
+  reduce:function(collection,reducer=haigeno1.identity,accumulator){
+    if (accumulator === undefined){
+      accumulator = collection[0]
+      for (var i = 1; i < collection.length; i++){
+        accumulator = reducer(accumulator,collection[i],i,collection)
+      }
+    } else{
+      for (var index in collection){
+        accumulator = reducer(accumulator,collection[index],index,collection)
+      }
+      return accumulator
     }
-    return res
   },
 
   filter:function(array,test){
@@ -298,8 +315,25 @@ var haigeno1 = {
     return res
   },
 
-  includes:function(){
-
+  includes:function(collection, value, fromIndex=0){
+    if (typeof collection === "string"){
+      return indexOf(value) !== -1
+    } else if (Array.isArray(collection) ){
+        fromIndex += collection.length
+        for (var i = fromIdex; i < collection.length; i++){
+          if (collection[i] === value){
+            return true
+          } 
+        return false
+        }
+    } else if (typeof collection === "object"){
+        for (var val of collection){
+          if (val === value){
+            return true
+          }
+        }
+      return false      
+    }
   },
 
   indexOf:function(array, value, fromIndex = 0){
@@ -330,7 +364,74 @@ var haigeno1 = {
 
   },
 
+  sumBy:function(array,iteratee=_.identity){
+    var res = 0
+    for (var i of array){
+      res += iteratee(i)
+    }
+    return res
+  },
 
+  sum:function(array){
+    return haigeno1.sumBy(array,haigeno1.identity)
+  },
+
+  property:function(path){
+    return function(obj){
+      return obj[path]
+    }
+  },
+
+  matches:function(source){
+    return function(obj){
+      for (var key in source){
+        if(obj[key] !== source[key]){
+          return false
+        }
+      }
+      return true
+    }
+  },
+
+  isMatch:function(object,source){
+    for (var key in source){
+      if (object[key] !== source[key]){
+        return false
+      } 
+    }
+    return true
+  },
+
+  isMatchWith:function(object, source, customizer){
+    for (var key in source){
+      if (customizer(object[key]) !== customizer(source[key])){
+        return false
+      } 
+    }
+    return true    
+  },
+
+  negate:function(predicate){
+    return function(...argx){
+      return !predicate(...argx)
+    }
+  },
+
+  size:function(collection){
+    if (typeof collection === "string" || Array.isArray(collection)){
+      return collection.length
+    } else if (typeof collection === "object"){
+      return Object.keys(collection).length
+    }
+  },
+
+  keys:function(object){
+    var res = []
+    for (var key in object){
+      res.push(key)
+    }
+    return res
+  },
 
 
 }
