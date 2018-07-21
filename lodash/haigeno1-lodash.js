@@ -59,7 +59,7 @@ var haigeno1 = {
       return false
     } 
     for (var key of keysA){
-      if (!keysB.includes(key) || !isEqual(a[key],b[key]) ){
+      if (!keysB.haigeno1.includes(key) || !haigeno1.isEqual(a[key],b[key]) ){
         return false
       }
     }
@@ -67,43 +67,42 @@ var haigeno1 = {
   },
 
   isEmpty:function(){
-
   },
 
-  isNumber:function(){
-
+  isBoolean:function(val){
+    return typeof(val) === "Boolean"
   },
 
-  isString:function(){
+  isNumber:function(val){
+    return haigeno1.getType(val) === 'Number'
+  },
 
+  isString:function(val){
+    return typeof(val) === "string"
   },
 
   isFunction:function(){
-
+    return typeof(val) === "function"
   },
 
-  isNaN:function(){
-
+  isNaN:function(val){
+    return val !== val
   },
 
-  isNull:function(){
+  isNull:function(val){
+    return val === null
+  },
 
+  isNill:function(val){
+    return val === null || val === undefined
   },
 
   isObject:function(value){
     return value !== null && typeof value === 'object' || typeof value === 'function'
   },
 
-  isObject:function(value){
-  return value !== null && typeof value === 'object'
-  },
-
-  isNill:function(){
-
-  },
-
-  isUndefined:function(){
-
+  isUndefined:function(val){
+    return typeof val === undefined
   },
 
   isArguments:function(value){
@@ -174,7 +173,7 @@ var haigeno1 = {
     return array
   },
 
-  fill:function(array,value,start=0,end=array.length){
+  fill2:function(array,value,start=0,end=array.length){
     return array.reduce(function(result, item, index, ary) {
       if (index >= start && index < end){
         result.push(value)
@@ -271,17 +270,16 @@ var haigeno1 = {
   },
 
   reduce:function(collection,reducer=haigeno1.identity,accumulator){
+    var keys = Object.keys(collection)
+    var values = Object.values(collection)
     if (accumulator === undefined){
-      accumulator = collection[0]
-      for (var i = 1; i < collection.length; i++){
-        accumulator = reducer(accumulator,collection[i],i,collection)
-      }
-    } else{
-      for (var index in collection){
-        accumulator = reducer(accumulator,collection[index],index,collection)
-      }
-      return accumulator
+      accumulator = values.shift()
+      keys.shift()
+    } 
+    for (var i = 0; i < keys.length; i++){
+      accumulator = reducer(accumulator,values[i],keys[i],collection)
     }
+    return accumulator
   },
 
   filter:function(array,test){
@@ -382,6 +380,12 @@ var haigeno1 = {
     }
   },
 
+  matchesProperty:function(path, srcValue){
+    return function(obj){
+      return haigeno1.get(obj,path) === srcValue
+    }
+  },
+
   matches:function(source){
     return function(obj){
       for (var key in source){
@@ -412,8 +416,8 @@ var haigeno1 = {
   },
 
   negate:function(predicate){
-    return function(...argx){
-      return !predicate(...argx)
+    return function(...args){
+      return !predicate(...args)
     }
   },
 
@@ -433,6 +437,158 @@ var haigeno1 = {
     return res
   },
 
+  keyBy:function(array,key){
+    var res = {}
+    for(var item of array){
+      res[item[key]] = item
+    }
+    return res
+  },
+
+  groupBy:function(array,propName){
+    var res = {}
+    for (var item of array){
+      if (res[item[propName]] in res){
+        res[item[propName]].push(item)
+      } else {
+        res[item[propName]] = [item]
+      }
+    }
+  },
+
+  groupBy1:function(ary,predicate){
+    return ary.reduce((res,item,index,array)=>{
+
+    },{})
+  },
+
+  bind:function(f,...fixedArgs){
+    return function(...args){
+      return f(...fixArgs,...args)
+    }
+  },
+
+  once:function(func){
+    var c = 0
+    var lastRes
+    return function(...arg){
+      c++
+      if (c === 1){
+        lastRes = func(...arg)
+      } 
+      return lastRes
+    }
+  },
+
+  ary:function(func,n = func.length){
+    return function(...args){
+      if (arguments.length > n) {
+        n = n
+      } 
+      return func()
+    }
+  },
+
+  unary:function(func){
+    return function(x){
+      return func(x)
+    }
+  },
+
+  flip:function(func){
+    return function(...args){
+      return func(...args.reverse())
+    }
+  },
+
+  spread:function(func,start = 0){
+    return function(ary){
+      return func.apply(null,ary)
+    }
+  },
+
+  every:function(collection, predicate=_.identity){
+    predicate = _.iteratee(predicate)
+    for (var val of collection){
+      if(!predicate(val)){
+        return false
+      }
+    }
+    return true
+  },
+
+  some:function(collection, predicate=_.identity){
+    predicate = _.iteratee(predicate)
+    for (var val of collection){
+      if (predicate(val)){
+        return true
+      }
+    }
+    return false
+  },
+
+  iteratee:function(func=_.identity){
+    var type = haigeno1.getType(func)
+    if (type === 'Function') {
+        return func
+    } else if (type === 'String') {
+        return property(func)
+    } else if (type === 'Object') {
+        return matches(func)
+    } else if (type === 'Array') {
+        return matchesProperty(func)
+    }
+  },
+    
+
+  method:function(path,...args){
+    return function(obj){
+      return haigeno1.get(obj,path)(...args)
+    }
+  },
+
+  get:function(object, path, defaultValue){
+    var path = haigeno1.toPath(path)
+    for (var val of path){
+      object = object[val]
+      if (object === undefined){
+        return defaultValue
+      }
+    }
+    return object
+  },  
+
+  toPath:function(value){
+    if (Array.isArray(value)){
+      return value
+    }
+    return value.toString().split("[").join(".").split("]").join("").split(".")
+  },
+
+  getType:function(val){
+    return Object.prototype.toString
+      .call(val)
+      .slice(8, -1)
+  },
+
+  find:function(collection, predicate=_.identity, fromIndex=0){
+    predicate = _.iteratee(predicate)
+    for (var i = fromIndex ; i < collection.length; i++){
+      if (predicate(collection[i])){
+        return collection[i]
+      }
+    }
+  },
+
+  findIndex:function(array, predicate=_.identity, fromIndex=0){
+    predicate = _.iteratee(predicate)
+    for (var i = fromIndex ; i < collection.length; i++){
+      if (predicate(collection[i])){
+        return i
+      }
+    }
+    return -1
+  },
 
 }
 
