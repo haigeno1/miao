@@ -257,6 +257,7 @@ var haigeno1 = (function(){
     isPrime :isPrime,
     fibb :fibb,
     getType: getType,
+    compact:compact,
   }
 
 
@@ -267,6 +268,7 @@ var haigeno1 = (function(){
     }
     return res
   }
+
 
   function compact(arr){
     var res = []
@@ -539,7 +541,21 @@ var haigeno1 = (function(){
     return accumulator
   }
 
+  function reduceRight(collection, reducer=identity, accumulator){
+    var keys = Object.keys(collection).reverse()
+    var values = Object.values(collection).reverse()
+    if (accumulator === undefined){
+      accumulator = values.shift()
+      keys.shift()
+    } 
+    for (var i = 0; i < keys.length; i++){
+      accumulator = reducer(accumulator,values[i],keys[i],collection)
+    }
+    return accumulator    
+  }
+
   function filter(array,test){
+    test = iteratee(test)
     return array.reduce((result, item, index, ary) => {
       if (test(item, index, ary)) {
         result.push(item)
@@ -548,18 +564,26 @@ var haigeno1 = (function(){
     },[])
   }
 
-  function forEach(collection, iteratee=_.identity){
-    if (Array.isArray(collection)){
-      for (var i = 0; i < array.length; i++){
-        action(array[i])
+  function forEach(collection, it=_.identity){
+    var action = iteratee(it)
+    for (var i in collection){
+      if (action(collection[i],i,collection) === false){
+        break
       }
-      return collection
-    } else if (typeof collection === "object"){
-      for (var i in collection){
-        iteratee(i,collection[i])
-      }
-      return collection
     }
+    return collection
+  }
+
+  function forEachRight(collection, it=_.identity){
+    var action = iteratee(it)
+    var arrKeys = Object.keys(collection)
+    var len = arrKeys.length
+    for (var i = len - 1; i >= 0; i--){
+      if (action(collection[arrKeys[i]],arrKeys[i],collection) === false){
+        break
+      }
+    }
+    return collection    
   }
 
   function slice(array, start=0, end=array.length){
@@ -816,7 +840,7 @@ var haigeno1 = (function(){
   }
 
   function get(object, path, defaultValue){
-    var path = haigeno1.toPath(path)
+    var path = toPath(path)
     for (var val of path){
       object = object[val]
       if (object === undefined){
@@ -825,6 +849,17 @@ var haigeno1 = (function(){
     }
     return object
   }  
+
+  function has(object, path){
+    var path = toPath(path)
+    for (var val of path){
+      object = object[val]
+      if (object === undefined){
+        return false
+      }
+    }
+    return true    
+  }
 
   function toPath(value){
     if (Array.isArray(value)){
@@ -935,16 +970,16 @@ var haigeno1 = (function(){
     if (!Array.isArray(arrays[arrays.length - 1])){
       var prep = iteratee(arrays.pop())
     }
-    return uniqBy([].concat(...arrays,prep))
+    return uniqBy([].concat(...arrays),prep)
   }
 
   function unionWith(...arrays){
     var comparator = arrays.pop();
-    return uniqWith([].concat(...arrays,comparator))
+    return uniqWith([].concat(...arrays),comparator)
   }
 
   function join(array, separator=','){
-    return array.reduce((res,item)=> res + separator + item)
+    return array.reduce((res,item)=> "" + res + separator + item)
   }
 
   function last(array){
@@ -970,6 +1005,7 @@ var haigeno1 = (function(){
     for (var i = 0; i < array.length; i++){
       if (values.includes(array[i])){
         array.splice(i,1)
+        i--
       }
     }
     return array
@@ -979,6 +1015,7 @@ var haigeno1 = (function(){
     for (var i = 0; i < array.length; i++){
       if (values.includes(array[i])){
         array.splice(i,1)
+        i--
       }
     }
     return array    
@@ -990,6 +1027,7 @@ var haigeno1 = (function(){
     for (var i = 0; i < array.length; i++){
       if (values1.includes(prep(array[i]))){
         array.splice(i,1)
+        i--
       }
     }
     return array    
@@ -1001,6 +1039,7 @@ var haigeno1 = (function(){
       for (var j of values)
       if (comparator(array[i],j)){
         array.splice(i,1)
+        i--
       }
     }
     return array  
@@ -1059,6 +1098,95 @@ var haigeno1 = (function(){
   function without(array, ...values){
     return array.filter(item => !values.includes(item))
   }
+
+  function forOwn(object, it=identity){
+    var predicate = iteratee(it)
+    Object.keys(object).some(key => !predicate(value,key,object))
+    return object
+  }
+
+  function forOwnRight(object, it=identity){
+    var predicate = iteratee(it)
+    Object.keys(object).reverse().some(key => !predicate(value,key,object))
+    return object    
+  }
+
+  function assign(object,...sources){
+    for (var src of sources){
+      for (var key in src){
+        object[key] = src[key]
+      }
+    }
+    return object
+  }
+
+  // function merge(object,...sources){
+  //   for (var src of sources){
+  //     for (var key in src){
+  //       if (object[key] === undefined){
+  //         object[key] = src[key]
+  //       } else if (_.isObject(object[key]) && _.isObject(src[key])){
+  //         merge (object[key],src[key])
+  //       } else if (_.isArray(object[key]) && _.isArray(src[key])){
+  //         object[key].forEach(i => src[key].forEach(j => merge(i,j)))
+  //       } 
+  //     }
+  //   }
+  //   return object    
+  // }
+
+  function merge(object,...sources){
+    sources.forEach(source=>{
+      Object.keys(source).forEach(key => {
+        if (!(key in object)){
+          object[key] = source[key]
+        } else {
+          if (Array.isArray(object[key]) && Array.isArray(source[key])){
+            merge(object[key],source[key])
+          } else if (_.isObject(object[key]) && _.isObject(source[key])){
+            merge(object[key],source[key])
+          }
+        }
+      })
+    })
+    return object
+  }
+
+
+
+  function keys(obj){
+    var res = []
+    for (var key in obj){
+      if(obj.hasOwnProperty(key)){
+        res.push(key)
+      }
+    }
+    return res
+  }
+
+  function values(obj){
+    var res = []
+    for (var key in obj){
+      if(obj.hasOwnProperty(key)){
+        res.push(obj[key])
+      }
+    }
+    return res
+  }
+
+  function entries(obj){
+    var res = []
+    for (var key in obj){
+      if(obj.hasOwnProperty(key)){
+        var tmp = []
+        tmp.push(String(key))
+        tmp.push(obj[key])
+        res.push(tmp)
+      }
+    }
+    return res
+  }
+
 
 
 
