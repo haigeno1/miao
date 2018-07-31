@@ -369,8 +369,12 @@ var haigeno1 = (function(){
     return val === null || val === undefined
   }
 
-  function isObject(value){
+  function isObject1(value){
     return value !== null && typeof value === 'object' || typeof value === 'function'
+  }
+
+  function isObject(value) {
+  return value === Object(value);
   }
 
   function isUndefined(val){
@@ -1186,6 +1190,84 @@ var haigeno1 = (function(){
     }
     return res
   }
+
+  function NEW(F, ...args) {
+    var obj = {}
+    obj.__proto__ = F.prototype
+    var result = F.apply(obj, args)
+    if (!result) {
+      return obj
+    }
+    if (typeof result === 'object') {
+      return result
+    }
+    return obj
+  }
+
+  function INSTANCEOF(val, fn) {
+    if (!val) {
+      return false
+    }
+    if (!val.__proto__) {
+      return false
+    }
+    if (val.__proto__.constructor === fn) {
+      return true
+    } else {
+      return INSTANCEOF(val.__proto__, fn)
+    }
+  }
+
+
+  function objToString(val) {
+    if (val === null) {
+      return '[object Null]'
+    }
+    if (val === undefined) {
+      return '[object Undefined]'
+    }  
+    return '[object ' + val.constructor.name + ']'
+  }
+
+  // function parition(array,start,end){
+  //   var pivotIndex = (end - start) * Math.random() | 0
+  //   var pivot = ary[pivotIndex]
+  //   swap (array,start,end)
+  //   for (var i = start - 1,j = start; j < end; j++){
+  //     if (ary[j] < pivot){
+  //       i++
+  //       swap (ary,j,i)
+  //     }
+  //   }
+  //   return array
+  // }
+
+  function parition(collection, predicate=identity){
+    var pred = iteratee(predicate)
+    return reduce((res,item) => pred(item) === "true" ? res[0].push(item) : res[1].push(item)
+    ,[[],[]])
+  }
+
+  function sortBy(collection, its){
+    its = its.map(it => iteratee(it)).reverse()
+    its.forEach(pred => collection.sort((a,b) => pred(a) > pred(b)))
+    return collection
+  }
+
+  function orderBy(collection,its,orders){
+    its = its.map(it => iteratee(it)).reverse()
+    oeders = orders.reverse()
+    its.forEach((pred,index) => {
+      if (order[index] === "desc") {
+        collection.sort((a,b) => pred(a) < pred(b))
+      } else {
+        collection.sort((a,b) => pred(a) > pred(b))
+      }
+    })
+    return collection    
+  }
+
+
 
 
 
