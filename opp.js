@@ -2,7 +2,7 @@ function MyMap(array){
   this.arr = []
   if (array.length){   
     this.arr[0] = {
-      key: array[1][0]
+      key: array[1][0],
       value: array[1][1]
     } 
   }
@@ -30,7 +30,7 @@ function MyMap(array){
     }
     return -1    
   }
-  this.set(key,value) = function{
+  this.set(key,value) = function() {
     if (!values.has(key)){
       this.arr[arr.length] = {key:key,value:value}
     } else {
@@ -49,7 +49,7 @@ function MyMap(array){
   this.keys = function(){
     return this.arr.forEach(k=>k.key)
   }
-  this.values = funciton(){
+  this.values = function(){
     return this.arr.forEach(v=>v.value)
   }
 }
