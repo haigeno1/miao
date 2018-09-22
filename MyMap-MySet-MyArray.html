@@ -1,0 +1,299 @@
+<script type="text/javascript">
+  
+var MyMap = (function(){
+
+  function findIndex(arr,val){
+    if (val !== val){
+      for (var i = 0; i < arr.length; i++){
+        if (arr[i] !== arr[i]){
+          return i
+        }
+      }
+      return -1
+    } else {
+      return arr.indexOf(val)
+    }
+  }
+    
+  function MyMap(maps){
+    //this._keys = []
+    //this._values = []
+    
+    Object.defineProperty(this,"_keys",{
+      value:[]
+    })
+    Object.defineProperty(this,"_values",{
+      value:[]
+    })
+    for (var pair of maps){
+      this.set(pair[0],pair[1])
+    }
+
+    //为何以下会Unexpected token this,而defineproperty可用
+    // get this.testSize1() {
+    //   return this._keys.length
+    // }
+
+    Object.defineProperty(this, "testSize2", {
+      get:function(){
+        return this._keys.length
+      }
+  })    
+    //this.size = this._keys.length
+    //size为何定义在原型上?为何要是getter?
+    //为何定义在原型上的size在keys,values的地方显示出来了?
+  }
+  Object.defineProperty(MyMap.prototype, "size", {
+    //MyMap.prototype可以是this吗?
+     
+    get:function(){
+      return this._keys.length
+    }
+  })
+
+  MyMap.prototype.keys = function(){
+    return this._keys.slice()
+  }
+
+  MyMap.prototype.values = function(){
+    return this._values.slice()
+  }  
+
+  MyMap.prototype.entries = function(){
+    var res = []
+    for (var i = 0; i < this._keys.length; i++){
+      res.push([this._keys[i],this._values[i]])
+    }
+    return res.slice()
+  }
+  
+  MyMap.prototype.get = function (key){
+    var idx = findIndex(this._keys,key)
+    if (idx !== -1) {
+      return this._values[idx]
+    } else {
+      return undefined 
+    }
+  }
+
+  MyMap.prototype.set = function(key,value){
+    if (findIndex(this._keys,key) === -1){
+      this._keys.push(key)
+      this._values.push(value)
+    } else {
+      this._values[findIndex(this._keys,key)] = value
+    }
+    return this
+  }
+
+  MyMap.prototype.has = function(key){
+    return findIndex(this._keys,key) !== -1
+  }
+  
+  
+  MyMap.prototype.delete = function(key){
+    var idx = findIndex(this._keys,key)
+    if (idx !== -1){
+      this._keys.splice(idx,1)
+      this._values.splice(idx,1)
+    }
+    return this
+  }
+
+  MyMap.prototype.clear = function(){
+    this._keys = []
+    this._values = []
+    return this
+  }
+
+  return MyMap
+})()
+
+
+
+// MyMap.prototype.get(key) 
+// MyMap.prototype.has(key) 
+// MyMap.prototype.delete(key) 
+// MyMap.prototype.clear() 
+
+// MyMap.prototype.keys() 
+// MyMap.prototype.values() 
+// MyMap.prototype.entries() 
+
+
+// function MySet(array){
+//   this.size = array.length
+//   for (var i = 0; i < array.length; i++){
+//     if (array[i] !== undefined){
+//       this[array[i]] = array[i]
+//     } else {
+//       continue
+//     }
+//   }
+// }
+
+class MySet{
+  constructor(vals){
+    this._values = []
+    //报错的写法 vals.forEach(this.add)
+    //报错的写法 vals.forEach(function(val) {
+    //    this.add(val)
+    // })
+    vals.forEach(i => this.add(i))
+    //  
+    //  values.forEach(this.add.bind(this))
+    //  
+    //  forEach(f,context)
+    //  values.forEach.call(this.add,context)
+    //  
+    //  values.forEach(this.add, this)
+    //  
+    //  values.forEach(function(val) {
+    //    this.add(val)
+    //  }, this)
+    //     
+    //   
+    //   
+  }
+  get size(){
+    return this._values.length
+  }
+  _indexOf(val){
+    if (val !== val){
+      for (var i = 0; i < this._values.length; i++){
+        if (this._values[i] !== this._values[i]){
+          return i
+        }
+      }
+      return -1
+    } else {
+      return this._values.indexOf(val)
+    }
+  }
+  has(val){
+    return this._indexOf(val) !== -1
+  }
+  add(val){
+    if (!this.has(val)){
+      this._values.push(val)
+    }
+    return this
+  }
+  forEach(iterator){
+    for (var i = 0; i < this._length.length; i++){
+      iterator(this._values[i],this)
+    }
+    return this
+  } 
+  delete(val){
+    var idx = this._indexOf(val)
+    if (idx !== -1){
+      this._values.splice(idx,1)
+    }
+    return this
+  }
+  clear(){
+    this._values = []
+    return this
+  }
+  keys(){
+    return this._values.slice()
+  }
+  values(){
+    return this.keys()
+  }
+}
+
+// MySet.prototype.size = 
+// MySet.prototype.add(value) = 
+// MySet.prototype.delete(value) = 
+// MySet.prototype.has(value) = 
+// MySet.prototype.clear() = 
+
+// MySet.prototype.keys() = 
+// MySet.prototype.values() = 
+// MySet.prototype.entries() = 
+// MySet.prototype.forEach() = 
+
+
+//是否考虑稀疏数组
+class MyArray{
+  //以下写法增加_length属性
+  // constructor(len){
+  // this._length = len   
+  // }
+  // get length(){
+  //   var maxIndex = 0
+  //   for (var i in this){
+  //     if(parseInt(i) == i){
+  //       maxIndex > parseInt(i) ? parseInt(i) : maxIndex = parseInt(i)
+  //     }
+  //   }
+  //   if (maxIndex + 1 > this._length){
+  //     this._length = maxIndex + 1
+  //   }
+  //   return this._length
+  // }
+  // set length(l){
+  //   if (l < this._length){
+  //     for (var i = l; i< this._length; i++){
+  //       delete this[i]
+  //     }
+  //     this._length = l
+  //   } else {
+  //     this._length = l
+  //   }
+  // }
+
+
+  constructor(len){
+    var length = len   
+    Object.defineProperty(this,"length",{
+      get:function(){
+        var maxIndex = 0
+        for (var i in this){
+          if(parseInt(i) == i){
+            maxIndex > parseInt(i) ? parseInt(i) : maxIndex = parseInt(i)
+          }
+        }
+        if (maxIndex + 1 > length){
+          length = maxIndex + 1
+        }
+        return length
+      },
+      set:function(l){
+        if (l < length){
+          for (var i = l; i< length; i++){
+            delete this[i]
+          }
+          length = l
+        } else {
+          length = l
+        }
+      }
+    })
+  }
+
+  fill(val){
+    for (var i =0 ; i < this.length; i++){
+      this[i] = val
+    }
+    return this
+  }
+  push(){
+    for (var i = this.length, j = 0; j < arguments.length; j++){
+      this[i++] = arguments[j]
+    }
+    return this
+  }
+  pop(){
+    var tmp = this[this.length-1]
+    this.length = this.length - 1
+    return tmp
+  }
+}
+  MyArray.prototype.__proto__ = Array.prototype
+
+</script>
+
+

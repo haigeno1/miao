@@ -1,0 +1,229 @@
+<script type="text/javascript">
+  function array2list(ary){
+    if (ary.length === 0){
+      return null
+    }
+    var head = p = {val:ary[0],next:null}
+    for (var i = 1; i < ary.length;i++){
+      var node = {val:ary[i],next:null}
+      p.next = node
+      p = node //p = p.next
+    }
+    return head
+  }
+
+  function array2list1(ary){
+    if (ary.length === 0){
+      return null
+    }    
+    var nodes = ary.map(i => ({value:i,next:null}))
+    for (var j = 0; j < nodes.length - 1; j++){
+      nodes[j].next = nodes[j+1]
+    }
+    return nodes[0]
+  }
+
+  function array2list2(ary,start = 0){
+    if (start === ary.length){
+      return null
+    }
+    var node = {
+      value:ary[start],
+      next:null
+    }
+    var rest = array2list2(ary,start + 1)
+    node.next = rest
+    return node
+  }
+
+
+  function list2array(head){
+    var res = [],p
+    p = head
+    while(p){
+      res.push(p.value)
+      p = p.next
+    }
+    return res
+  }
+
+  function list2array1(head){
+    if (!head){
+      return []
+    }
+    var res = [head.value]
+    var rest = list2array1(head.next)
+    return res.concat(rest)
+  }
+
+  function length(head){
+    var count = 0
+    var p = head
+    while(p){
+      count++
+      p = p.next
+    }
+    return count
+  }
+
+  function nth(head,n){
+    var len = size(head)
+    if (n > len){
+      return undefined
+    }
+    var p = head 
+    while(n--){
+      p = p.next
+    }
+    return p
+  }
+
+  function nth1(head,n){
+    if (head === null){
+      return null
+    }
+    if (n === 0){
+      return head
+    }
+    return nth1(head.next,n-1)
+  }
+
+  function insert(head,n,value){
+    var node = {
+      value:value,
+      next:null
+    }
+    if (head === null){
+      return node
+    }
+    if (n === 0){
+      node.next = head
+      return node
+    }
+    var p = head
+    while(--n){
+      p = p.next
+    }
+    node.next = p.next
+    p.next = node
+  }
+
+  function insert1(head,n,value){
+    if (head.next === null){
+      var node = {
+            value:value,
+            next:null
+          }      
+      node.next = head.next
+      head.next = node
+      return head
+    }
+
+    if (n === 0){
+      var node = {
+            value:value,
+            next:head
+          }
+      return node
+    }
+    if (n === 1){
+      var node = {
+            value:value,
+            next:null
+          }
+      node.next = head.next
+      head.next = node
+    }
+    insert(head.next,n-1,value)
+    return head
+  }
+
+  function insert2(head,n,value){
+    var node = {
+      value:value,
+      next:null
+    }
+    if (head === null){
+      return node
+    }
+    if (n === 0){
+      node.next = head
+      return node
+    }
+    node.next = insert2(head.next,n-1,value)
+    return head
+  }
+
+  function remove(head,n){
+    if (head===null){
+      return null
+    }
+    if (n===0){
+      return head.next
+    }
+    var p = head
+    while(--n){
+      p = p.next 
+    }
+    p.next = p.next.next
+    return head
+  }
+
+  function remove1(head,n){
+    if (!head){
+      return null
+    }
+    if (n===0){
+      return head.next
+    } 
+    if (n===1){
+      head.next = head.next.next
+      return head
+    } else {
+      remove1(head.next,n-1)
+    }
+    return head
+  }
+
+  function remove2(head,n){
+    if (head === null){
+      return null
+    }
+    if (n===0){
+      return head.next
+    }
+    head.next = remove2(head.next,n-1)
+    return head
+  }
+
+
+  function reverse(head){
+    var p1 = null
+    var p2 = null
+    var p3 = head
+
+    while(p3){
+      p1 = p2
+      p2 = p3
+      p3 = p3.next
+      p2.next = p1
+    }
+    return p2
+  }
+
+  function reverse1(head){
+    if (!head || !head.next){
+      return head
+    }
+    var tail = head.next
+    head.next = null
+    var res = reverse1(tail)
+    tail.next = head
+    return res
+  }
+
+
+
+
+
+</script>

@@ -338,11 +338,30 @@ var haigeno1 = (function(){
     return true 
   }
 
-  function isEmpty(){
+  function getType(val){
+    return Object.prototype.toString
+      .call(val)
+      .slice(8, -1)
+  }  
+
+
+  function isEmpty(obj){
+    for (let i in ){
+      return false
+    }
+    return true
+  }
+
+  function isEmpty1(obj){
+    return JSON.stringify(obj)==="{}"
+  }
+
+  function isEmpty2(obj){
+    return !Object.keys(obj).length
   }
 
   function isBoolean(val){
-    return typeof(val) === "Boolean"
+    return getType(val) === "Boolean"
   }
 
   function isNumber(val){
@@ -350,11 +369,39 @@ var haigeno1 = (function(){
   }
 
   function isString(val){
-    return typeof(val) === "string"
+    return getType(val) === "String"
   }
 
   function isFunction(){
-    return typeof(val) === "function"
+    return getType(val) === "Function"
+  }
+
+  function isDate(value){
+    return getType(value) === "Date"
+  }
+
+  function isError(value){
+    return getType(value) === "Error"
+  }
+
+  function isMap(value){
+    return getType(value) === "Map"
+  }
+
+  function isSet(value){
+    return getType(value) === "Set"
+  }
+
+  function isSymbol(value){
+    return getType(value) === "Symbol"
+  }
+
+  function isWeakMap(value){
+    return getType(value) === "WeakMap"
+  }
+
+  function isWeakSet(value){
+    return getType(value) === "WeakSet"
   }
 
   function isNaN(val){
@@ -365,8 +412,56 @@ var haigeno1 = (function(){
     return val === null
   }
 
+  function isUndefined(val){
+    return typeof val === undefined
+  }
+
   function isNill(val){
-    return val === null || val === undefined
+    return val === null || typeof val === undefined
+  }
+
+  function isArguments(value){
+    return getType(value) === "[object Arguments]"
+  }
+
+  function isArray(x){
+    return Array.isArray(x)
+  }
+
+  //??
+  function isArrayBuffer(value){
+    return getType(value) === 'ArrayBuffer'
+  }
+
+  function isSafeInteger(value){
+    return  Number.isSafeInteger(value)
+  }
+
+  function isArrayLike(value){
+    return typeof value!== "function" && value >= 0 && Number.isSafeInteger(value.length)
+  }
+
+  function isTypedArray(value){
+    return getType(value) === "Uint8Array"
+  }
+
+  function isArrayLikeObject(value){
+    return typeof value === "object" && isArrayLike(value)
+  }
+
+  function isNative(value){
+    return Function.prototype.toString.call(value).indexOf("[native code]") !== -1
+  }
+
+  function isPrimitive(val){
+    var type = typeof val
+    switch(type){
+      case "number" : 
+      case "string" : 
+      case "boolean" :
+      return true 
+    }
+    return false
   }
 
   function isObject1(value){
@@ -374,20 +469,167 @@ var haigeno1 = (function(){
   }
 
   function isObject(value) {
-  return value === Object(value);
+    return value === Object(value);
   }
 
-  function isUndefined(val){
-    return typeof val === undefined
+  function isObjectLike(value){
+    return value !== null && typeof value === "object"
   }
 
-  function isArguments(value){
-    return Object.prototype.toString.call(value) === "[object Arguments]"
+  function isPlainObject(value){
+    return value.constructor === null || value.constructor.name = "Object" 
+  }  
+  //??
+  function isFinite(value){
+    return Number.isFinite(value)
   }
 
-  function isArray(x){
-    return Array.isArray(x)
+  function isInteger(value){
+    return Number.isInteger(value)
   }
+
+  function isLength(value){
+    return Number.isInteger(value) &&  value < 4294967295 && value >= 0
+  }
+
+  function isElement(value){
+    return value instanceof Node
+  }
+
+
+  function lt(val,other){
+    return val < other
+  }
+
+  function lte(val,other){
+    return val <= other
+  }
+
+  function toArray(val){
+    var res = []
+    for (var i in val){
+      res.push(val[i])
+    }
+    return res
+  }
+
+  function toFinite(val){
+    if (val === Infinity){
+      return Number.MAX_VALUE
+    }
+    if (val === -Infinity){
+      return Number.MIN_VALUE
+    } else {
+      return +val||0
+    }
+  }
+
+  function toInteger(val){
+    if (val === Infinity){
+      return Number.MAX_VALUE
+    }
+    if (val === -Infinity){
+      return Number.MIN_VALUE
+    }
+    return val>=0 ? Math.floor(val):Math.ceil(val)
+  }
+
+  function toLength(val){
+    if(value >= 4294967295)
+      return 4294967295
+    if(value < 0)
+      return 0
+    return Math.floor(value)
+  }
+
+  function toNumber(val){
+    return Number(val)
+  }
+
+  function assign(val){
+    
+  }
+
+  function toSafeInteger(val){
+    
+  }
+
+  function add(val){
+    
+  }
+
+  function ceil(val){
+    
+  }
+
+  function divide(val){
+    
+  }
+
+  function floor(val){
+    
+  }
+
+  function max(val){
+    
+  }
+
+  function maxBy(val){
+    
+  }
+
+  function mean(val){
+    
+  }
+
+  function meanBy(val){
+    
+  }
+
+  function min(val){
+    
+  }
+
+  function minBy(val){
+    
+  }
+
+  function multiply(val){
+    
+  }
+
+  function round(val){
+    
+  }
+
+  function subtract(val){
+    
+  }
+
+  function sum(val){
+    
+  }
+
+  function sumBy(val){
+    
+  }
+
+  function clamp(val){
+    
+  }
+
+  function inRange(val){
+    
+  }
+
+  function random(val){
+    
+  }
+
+  function assignIn(val){
+    
+  }
+
 
   function identity(...values){
     return values[0]
@@ -460,6 +702,14 @@ var haigeno1 = (function(){
     }
     return res    
   }
+  // flatten1 = [].concat.apply.bind([].concat,[])
+  // [].concat.apply([])
+  // [].concat
+  // function flatten(ary){return [].concat.apply([],ary)}
+  // 
+  // Array.prototype.concat.apply.bind(Array.prototype.concat,[])
+  // Array.prototype.concat.apply([])
+  // [].concat
 
   function flattenDeep(array){
     var res = []
@@ -510,8 +760,16 @@ var haigeno1 = (function(){
     return res
   }
 
-  function cloneDeep(){
-
+  function cloneDeep(obj){
+    var res = {}
+    for (var key in obj){
+      if (typeof obj[key] === "object"){
+        res[key] = cloneDeep(obj[key])
+      } else {
+        res[key] = obj[key]
+      }
+    }
+    return res
   }
 
   function map (array,mapper){
@@ -872,11 +1130,7 @@ var haigeno1 = (function(){
     return value.toString().split("[").join(".").split("]").join("").split(".")
   }
 
-  function getType(val){
-    return Object.prototype.toString
-      .call(val)
-      .slice(8, -1)
-  }
+  
 
   function find(collection, predicate=_.identity, fromIndex=0){
     predicate = _.iteratee(predicate)
@@ -932,14 +1186,15 @@ var haigeno1 = (function(){
   }
 
   function uniq(array){
-    var res = []
-    for (var i = 0; i < array.length; i++){
-      if (!res.includes(array[i])){
-        res.push(array[i])
-      }
-    }
-    return res
-  }
+    // var res = []
+    // for (var i = 0; i < array.length; i++){
+    //   if (!res.includes(array[i])){
+    //     res.push(array[i])
+    //   }
+    // }
+    // return res
+    return Array.from(new Set(array))
+  }œ
 
   function uniqBy(array, predicate=_.identity){
     var prep = iteratee(predicate)
@@ -1191,32 +1446,261 @@ var haigeno1 = (function(){
     return res
   }
 
-  function NEW(F, ...args) {
-    var obj = {}
-    obj.__proto__ = F.prototype
-    var result = F.apply(obj, args)
-    if (!result) {
+
+  function myFunctions(){
+
+    function NEW(F, ...args) {
+      var obj = {}
+      obj.__proto__ = F.prototype
+      var result = F.apply(obj, args)
+      if (!result) {
+        return obj
+      }
+      if (typeof result === 'object') {
+        return result
+      }
       return obj
     }
-    if (typeof result === 'object') {
-      return result
+
+    function myCall(context){
+      context = context || window
+      context.tmp666666 = this
+      var args = [...arguments].slice(1)
+      var res = context.tmp666666(args)
+      delete context.tmp666666
+      return res
     }
-    return obj
+
+    function myApply(context){
+      context = context || window
+      context.tmp666666 = this
+      if (arguments[1]){
+        var res = context.tmp666666(...arguments[1])
+      } else {
+        var res = context.tmp666666()
+      }
+      delete context.tmp666666
+      return res
+    }
+
+    function myBind(context){
+      if (typeof this !== "function"){
+        throw new TypeError("errorerror")
+      }
+      var _this = this
+      var args = [...arguments].slice(1)
+      return function ff(){
+        if(this instanceof ff){
+          return _this(...args,...arguments)
+        }
+        return _this.apply(context,args.concat(...arguments))
+      }
+    }
+
+    function INSTANCEOF(val, fn) {
+      if (!val) {
+        return false
+      }
+      if (!val.__proto__) {
+        return false
+      }
+      if (val.__proto__.constructor === fn) {
+        return true
+      } else {
+        return INSTANCEOF(val.__proto__, fn)
+      }
+    }
+
+    function convent(a,b){
+        //234..toString(2)
+    }
+
+    //jQuery
+    class queueFunction {
+      constructor(){
+        this.tasks=[]
+        this.running = false
+      }
+      queue(f){
+        if (this.running){
+          this.tasks.push(f)
+        } else {
+          this.running = true
+          var done
+          f(done=()=>{
+            if (this.tasks.length){
+              var task = this.tasks.shift()
+              task(done)
+            } else {
+              this.running = false
+            }
+          })
+        }
+        return this
+      }
+    }
+      // new queueFunction().queue(function(next){
+      //   console.log(1)
+      //     next()
+      // }).queue(function(next){
+      //     setTimeout(next,3000)
+      // }).queue(function(next){
+      //     console.log(2)
+      //     next()
+      // }).queue(function(next){
+      //     console.log(3)
+      //     next()
+      // })    
+
+
+    //async
+    function asyncMap(ary, asyncMapper, callback) {
+      var result = []
+      var count = 0
+      for(let i = 0; i < ary.length; i++) {
+        asyncMapper(ary[i], function(err, val) {
+          count++
+          result[i] = val
+          if (count === ary.length) {
+            callback(null, result)
+          }
+        })
+      }
+    }
+      // function square(x,cb){
+      //   setTimeout(cb(null,x*x),2000)
+      // }
+      // //square(3,(x,y)=>{console.log(x,y)})
+
+      // asyncMap([1,2,3,4],square,function(err,result){
+      //   console.log(result)
+      // })      
+    function asyncFilter(ary, asyncPredicate, callback) {
+      var result = []
+      var count = 0
+      for(let i = 0; i<ary.length; i++) {
+        asyncPredicate(ary[i], function(err, shouldSave) {
+          count++
+          if (shouldSave) {
+            result[i] = ary[i]
+          }
+          if (count === ary.length) {
+            result = result.filter(it => it)
+            callback(null, result)
+          }
+        })
+      }
+    }
+    function asyncEach(ary, asyncIterator, callback) {
+      var count = 0
+      for(var i = 0; i < ary.length; i++) {
+        asyncIterator(ary[i], function(err) {
+          count++
+          if (count === ary.length) {
+            callback(null)
+          }
+        })
+      }
+    }
+
+
+    //promise
+    Promise.resolve = function(value){
+      return new Promise(function(resolved){
+        resolved(value)
+      })
+    }  
+      
+    Promise.all = function(promises){
+      return new Promise(function(resolve,reject){
+        var result = []
+        var count = 0
+        for (let i=0; i < promises.length; i++){
+          promises[i].then(function(value){
+            result[i] = value
+            count++
+            if (count === promises.length){
+              resolve(result)
+            }
+          },reject)
+        }
+        
+      })
+    }
+
+    Promise.race = function(promises){
+      return new Promise(function(resolve,reject){
+        for(let i = 0; i < promise.length; i++){
+          promises[i].then(resolve,reject)
+        }
+      })
+    }    
+
+    //node
+    class EventEmitter {
+      constructor() {
+        this.eventMap = Object.create(null)
+      }
+
+      on(type, handler) {
+        if (type in this.eventMap) {
+          this.eventMap[type].push(handler)
+        } else {
+          this.eventMap[type] = [handler]
+        }
+        return this
+      }
+
+      off(type, handler) {
+        if (type in this.eventMap) {
+          this.eventMap[type] = this.eventMap[type].filter(it => it != handler)
+        }
+        return this
+      }
+
+      once(type, handler) {
+        return this.on(type, function temp(...args) {
+          handler.apply(this, args)
+          this.off(type, temp)
+        })
+      }
+
+      emit(type, ...args) {
+        if (type in this.eventMap) {
+          this.eventMap[type].forEach(handler => handler.apply(this, args))
+        }
+        return this
+      }
+    }
+    function promisify(f) {
+      return function(...args) {
+        return new Promise((resolve, reject) => {
+          f(...args, (err, result) => {
+            if (err) {
+              reject(err)
+            } else {
+              resolve(result)
+            }
+          })
+        })
+      }
+    }
+    function callbackify(f) {
+      return function(...args){
+        var callback = args.pop()
+        
+        f(...args).then(value => {
+          callback(null, value)
+        }, reason => {
+          callback(reason, null)
+        })
+      }
+    }
+
+
+
   }
 
-  function INSTANCEOF(val, fn) {
-    if (!val) {
-      return false
-    }
-    if (!val.__proto__) {
-      return false
-    }
-    if (val.__proto__.constructor === fn) {
-      return true
-    } else {
-      return INSTANCEOF(val.__proto__, fn)
-    }
-  }
 
 
   function objToString(val) {
@@ -1267,17 +1751,47 @@ var haigeno1 = (function(){
     return collection    
   }
 
+  function flow(...funcs){
+    var fs = Array.slice.call(funcs)
+    return function(...args){
+      return fs.reduce((res,f)=> f(res),args)
+    }
+  }
 
 
+  function curry(func,len=func.length){
+    return function(...args){
+      if (args.length >= len){
+        return func(...args)
+      } else {
+        return curry.bind(null,...args)
+      }
+    }
+  }
 
 
+  function debounce(f,duration){
+    var id
+    return function(...args){
+      clearTimeout(id)
+      id = setTimeout(()=>{
+        f.apply(this,args)
+      },duration)
+    }
+  }
 
+  function throttle(f,duration){
+    var lastTime = 0
+    return function(){
+      var now = Date.now()
+      if (now - lastTime > duration){
+        f.apply(this,arguments)
+        lastTime = now
+      }
+    }
+  }
 
-
-
-
-
-
+  
 
 })()
 

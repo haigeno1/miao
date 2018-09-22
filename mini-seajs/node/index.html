@@ -1,0 +1,75 @@
+<script type="text/javascript">
+  function readFile(name,callback){
+    var xhr = new XMLHttpRequest()
+    xhr.open("GET",name)
+    xhr.onload = function(){
+      callback(xhr.responseText)
+    }
+    xhr.send()
+  }
+
+  function getDeps(source){
+    // /require2\s*\(\s*['"][^'"]*?['"]\s*\)/g
+    var pathAll = source.match(/myRequire/g)
+    if (!pathAll){
+      return []
+    }
+    // /require2\s*\(\s*['"]([^'"]*?)['"]\s*\)/
+    var pathKeys = pathAll.map(m => m.match(/myRequire/)[1])
+    return pathKeys
+  }
+
+  var count = 0
+  function getDepthAndSources(name,allLoaded){
+    count++
+    readFile(name,function(src){
+      myRequire.sourceCache[name] = src
+      var next = getDeps(name)
+      next.forEach(path => {
+        getDepthAndSources(path,allLoaded)
+      })
+      count--
+      if (count === 0){
+        allLoaded()
+      }
+    })
+  }
+
+  function getDepthAndSources1(name,allLoaded){
+    return Promise.resolve()
+            .then(function(){
+              //return readFile(name,getDeps)
+              readFile(name,function(src){
+                myRequire.sourceCache[name] = src
+                return getDeps(name)
+              })
+            })
+            .then(function(next){
+              Promise.all(next.forEach(readFile))
+            })
+            .finally(allLoaded)
+  }
+
+  // var fs = require("fs")
+  // function readFile(path){
+  //   return fs.readFileSync(path).toString()
+  // }
+  myRequire.sourceCache = Object.create(null)
+  function myRequire(name){
+    var moduleSource = myRequire.sourceCache[name]
+    var exports = {}
+    var module = {
+      //这里能否直接写exports:{}??
+      exports:exports
+    }
+    var moduleFunction = new Function(exports,module,moduleSource)
+    moduleFunction(exports,module) 
+    return module.exports
+  }
+
+  function initial(name){
+    getDepthAndSources(name,() => myRequire(name))
+  }
+
+  initial("app.js")
+</script>

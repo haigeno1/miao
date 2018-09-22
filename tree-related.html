@@ -1,0 +1,167 @@
+<script type="text/javascript">
+ 
+  function array2tree(ary,i=0){
+    if (ary[i] == null){
+      return null
+    }
+    return {
+      value: ary[i],
+      left: array2tree(ary,2 * i + 1),
+      right: array2tree(ary,2 * i + 2)
+    }
+  }
+
+  function array2tree1(array,root=
+    {value:array[0],left:null,right:null},i=0){
+    if(!array[2*i+1] && !array[2*i+2]){
+      return 
+    }
+    root.left = {
+      value: array[2 * i + 1],
+      left: null,
+      right: null
+    }
+    root.right = {
+      value: array[2 * i + 2],
+      left: null,
+      right: null
+    }
+    array2tree1(array,root.left,2 * i + 1)
+    array2tree1(array,root.right,2 * i + 2)
+    return root  
+  }
+
+  function array2tree2(ary){
+    if (ary.length === 0) {
+      return null
+    }    
+    var curr,root
+    curr = root = {
+        value: ary[0],
+        left: null,
+        right: null
+      }
+    var queue = [root]
+    for (var i = 1; i < ary.length; i++){
+      curr = queue.shift()
+      var node1 = {
+        value: ary[i],
+        left: null,
+        right: null
+      }
+      queue.push(node1)
+      curr.left = node1
+      i++
+      if (i < ary.length){
+        var node2 = {
+          value: ary[i],
+          left: null,
+          right: null
+        }
+        queue.push(node2)
+        curr.right = node2
+      }
+    }
+    return root
+    
+  }
+
+  //可以用unary函数避免多余的参数
+  function tree2array(root,i=0,result=[]){
+    if (!root){
+      return
+    } 
+    result[i] = root.value
+    tree2array(root.left,2 * i + 1,result)
+    tree2array(root.right,2 * i + 2,result)
+    return result
+  }
+
+
+  //以下1不适用处理不是完全二叉树的情况
+  function tree2array1(root){
+    if (!root) {
+      return []
+    }    
+    var result = []
+    var curr = root
+    var queue = [root]
+    while(queue.length !== 0){
+      curr = queue.shift()
+      result.push(curr.value)
+      if (curr.left!==null){
+        queue.push(curr.left)
+      }
+      if (curr.right!==null){
+        queue.push(curr.right)
+      }
+    }
+    return result
+  }
+
+  function tree2array2(root){
+    if(!root){
+      return []
+    }
+    var result = [root.value]
+    var queue = [root]
+    while(curr = queue.shift()){
+      if (curr.left !== null){
+        queue.push(curr.left)
+        result.push(curr.left.value)
+      } else {
+        result.push(null)
+      }
+      if (curr.right !== null){
+        queue.push(curr.right)
+        result.push(curr.right.value)
+      } else {
+        result.push(null)
+      }
+    }
+    while(result[result.length-1] === null){
+      result.pop()
+    }
+    return result
+
+  }
+
+
+  //能否根据前中后遍历结果反推出树的结构??貌似不行
+  function preOrderTraverse(root,action){
+    if (root!=null){
+      action(root.value)
+      preOrderTraverse(root.left,action)
+      preOrderTraverse(root.right,action)
+    }
+  }
+  function inOrderTraverse(root,action){
+    if (root!=null){
+      inOrderTraverse(root.left,action)
+      action(root.value)
+      inOrderTraverse(root.right,action)
+    }
+  }
+  function postOrderTraverse(root,action){
+    if (root!=null){
+      postOrderTraverse(root.left,action)
+      postOrderTraverse(root.right,action)
+      action(root.value)
+    }
+  }  
+
+  
+  class PriorityQueue{
+    constructor(){
+
+    } 
+  }
+
+  class HashTable{
+    constructor(){
+
+    } 
+  }  
+
+
+</script>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>myjQuery</title>
+</head>
+<body>
+  <script type="text/javascript">
+    // var obj = {
+    //   arr:[],
+    //   flag:1,
+
+    //   queue: function(f) {
+    //     this.arr.push(f)
+    //     this.hold()
+    //     return this
+    //   }
+    //   hold:function(){
+    //     var n = function(){flag = 1}
+    //     if (this.flag){
+    //       this.flag = 0
+    //       this.arr.shift(n)
+    //     } else {
+    //       this.addEventListener("",this.hold())
+    //     }
+    //     return this
+    //   }
+    // }
+
+    class queueFunction {
+      constructor(){
+        this.tasks=[]
+        this.running = false
+      }
+      queue(f){
+        if (this.running){
+          this.tasks.push(f)
+        } else {
+          this.running = true
+          var done
+          f(done=()=>{
+            if (this.tasks.length){
+              var task = this.tasks.shift()
+              task(done)
+            } else {
+              this.running = false
+            }
+          })
+        }
+        return this
+      }
+    }
+    new queueFunction().queue(function(next){
+      console.log(1)
+        next()
+    }).queue(function(next){
+        setTimeout(next,3000)
+    }).queue(function(next){
+        console.log(2)
+        next()
+    }).queue(function(next){
+        console.log(3)
+        next()
+    })
+
+    
+  </script>
+</body>
+</html>

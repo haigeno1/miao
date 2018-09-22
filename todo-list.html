@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>todo</title>
+  <style type="text/css">
+    ul.active li.completed{
+      display:none;
+    }
+    ul.completed li:not(.completed){
+      display: none;
+    }
+    li.completed{
+      text-decoration:line-through;
+
+    }
+  </style>
+</head>
+<body>
+  <section id="wrapper"></section>
+  <script type="text/javascript">
+    var todos = [
+      {
+        done:true,
+        content:"foo"
+      },{
+        done:false,
+        content:"bar"
+      }
+    ]
+    var show = "all"
+    function data2html(todos){
+      return `
+        <input type="checkbox" id="toggle-select-all" ${todos.every(it=>it.done) ? "checked" : ""}>
+        <input type="text" id="todo-input">
+        <ul id="todo-list" class=${show}>
+          ${
+            todos.map(it=>`
+              <li class="${it.done ? "completed" : "uncompleted"}">
+                <input type="checkbox" ${it.done?"checked":""}>
+                <span>${it.content}</span>
+                <a href="javascript:" class="delete">&times</a>
+              </li>
+            `).join("")
+          }
+        </ul>
+        <div>
+          <span><span>${todos.filter(it=>!it.done).length}</span>items left</span>
+          <span>
+            <input type="radio" name="filter" ${show==="all"?"checked":""} value= "all">all
+            <input type="radio" name="filter" ${show==="active"?"checked":""} value= "active">active
+            <input type="radio" name="filter" ${show==="completed"?"checked":""} value= "completed">completed
+          </span>
+          <button style="display:${todos.some(it=>it.done)?"inline-block":"none"}">clear all completed</button>
+        </div>
+      `
+      }
+    function render(){
+      wrapper.innerHTML = data2html(todos)
+    }
+    document.addEventListener("DOMContentLoaded",function(){
+      console.log(1)
+      render()
+    })
+
+    
+
+    wrapper.addEventListener("keyup",function(e){
+
+      if (e.target.matches("#todo-input")&&e.target.value.trim()&&e.code==="Enter"){
+        console.log(e)
+        todos.push({
+          done:false,
+          content:e.target.value.trim()
+        })
+        e.target.value=""
+        render()
+        document.querySelector("#todo-input").focus()
+      }
+    })
+
+    wrapper.addEventListener("click",e=>{
+      if (e.target.matches("a.delete")){
+        var li = e.target.parentNode
+        var index = Array.from(li.parentNode.children).findIndex(it=>it===li)
+        todos.splice(index,1)
+        render()
+      }
+    })
+
+    wrapper.addEventListener("click",e=>{
+      if (e.target.matches("ul li input[type='checkbox']")){
+        var li = e.target.parentNode
+        var index = Array.from(li.parentNode.children).findIndex(it=>it===li)
+        todos[index].done = e.target.checked
+        render()
+      }
+    })
+
+    wrapper.addEventListener("click",e=>{
+      if (e.target.matches("#toggle-select-all")){
+        if (e.target.checked){
+          todos.forEach(it=>it.done=true)
+        } else {
+          todos.forEach(it=>it.done=false)
+        }
+        render()
+      }
+    })
+
+    function delegate(selector,event,callback){
+      wrapper.addEventListener(event,function(e){
+        if (e.target.matches(selector)){
+          callback(e)
+          render()
+        }
+      })
+    }
+
+    delegate("button","click",function(e){
+      todos = todos.filter(it=>!it.done)
+    })
+
+    delegate("input[type='radio']","click",function(e){
+      show = e.target.value
+    })
+
+  </script>
+</body>
+</html>

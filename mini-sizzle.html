@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+</head>
+<body>
+<div id="foo" class="apple google orange" title="hoverme!">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis, aliquid.</div>
+<script>
+// div[type="text"] span#abc .foo#bar
+function isMatchSelector(node, selector) {
+  var comboSelectors = selector.split(' ')
+
+  if (isMatchComboSelector(node, comboSelectors[comboSelectors.length - 1])) {
+    var p = node.parentNode
+    var i = comboSelectors.length - 2
+
+    while(p && i >= 0) {
+      if (isMatchComboSelector(p, comboSelectors[i])) {
+        p = p.parentNode
+        i--
+      } else {
+        p = p.parentNode
+      }
+    }
+
+    if (i === -1) {
+      return true
+    }
+  }
+  return false
+}
+
+// div.foo.bar#id[attr="value"]:first-child
+function isMatchComboSelector(node, selector) {
+  var singleSelectors = selector.split(/(?=\.|#|\[|:)/g)
+  return singleSelectors.every(ss => {
+    return isMatchSingleSelector(node, ss)
+  })
+}
+
+// div
+// .foo
+// #id
+// [foo="bar"]
+// :xxx
+function isMatchSingleSelector(node, selector) {
+  switch(selector[0]) {
+    case '.':
+      return isMatchClassSelector(node, selector)
+    case '#':
+      return isMatchIdSelector(node, selector)
+    case '[':
+      return isMatchAttrSelector(node, selector)
+    case ':':
+      return isMatchPseudoClassSelector(node, selector)
+    default:
+      return isMatchElementSelector(node, selector)
+  }
+}
+
+function isMatchClassSelector(node, selector) {
+  return node.classList.contains(selector.slice(1))
+}
+
+function isMatchIdSelector(node, selector) {
+  return node.id === selector.slice(1)
+}
+
+// [attr]
+// [attr="value"]
+function isMatchAttrSelector(node, selector) {
+  var selector = selector.slice(1, -1)
+  var parts = selector.split('=')
+  if (parts.length === 1) {
+    return node.hasAttribute(parts[0])
+  } else {
+    return node.getAttribute(parts[0]) === parts[1].slice(1,-1)
+  }
+}
+
+
+// :fist-child
+// :not()
+// :nth-child()
+function isMatchPseudoClassSelector(node, selector) {
+  selector = selector.slice(1)
+
+  return true
+}
+
+function isMatchElementSelector(node, selector) {
+  return node.tagName === selector.toUpperCase()
+}
+
+</script>
