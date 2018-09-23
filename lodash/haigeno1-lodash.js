@@ -339,9 +339,7 @@ var haigeno1 = (function(){
   }
 
   function getType(val){
-    return Object.prototype.toString
-      .call(val)
-      .slice(8, -1)
+    return Object.prototype.toString.call(val).slice(8, -1)
   }  
 
 
@@ -370,6 +368,10 @@ var haigeno1 = (function(){
 
   function isString(val){
     return getType(val) === "String"
+  }
+
+  function isRegExp(val){
+    return getType(val) === "RegExp"
   }
 
   function isFunction(){
@@ -404,8 +406,16 @@ var haigeno1 = (function(){
     return getType(value) === "WeakSet"
   }
 
-  function isNaN(val){
-    return val !== val
+  function isNaN(value) {
+    return Object.prototype.toString.call(value) === '[object Number]' && isNaN(value)
+  }
+  function isNaN1(value) {
+    if (value !== value) {
+        return true
+    } else if (typeof value === 'object') {
+        return value.toString() === 'NaN'
+    }
+    return false
   }
 
   function isNull(val){
@@ -413,10 +423,10 @@ var haigeno1 = (function(){
   }
 
   function isUndefined(val){
-    return typeof val === undefined
+    return typeof val === Undefined
   }
 
-  function isNill(val){
+  function isNil(val){
     return val === null || typeof val === undefined
   }
 
@@ -428,7 +438,6 @@ var haigeno1 = (function(){
     return Array.isArray(x)
   }
 
-  //??
   function isArrayBuffer(value){
     return getType(value) === 'ArrayBuffer'
   }
@@ -438,7 +447,7 @@ var haigeno1 = (function(){
   }
 
   function isArrayLike(value){
-    return typeof value!== "function" && value >= 0 && Number.isSafeInteger(value.length)
+    return typeof value!== "function" && Number.isSafeInteger(value.length)
   }
 
   function isTypedArray(value){
@@ -446,7 +455,7 @@ var haigeno1 = (function(){
   }
 
   function isArrayLikeObject(value){
-    return typeof value === "object" && isArrayLike(value)
+    return typeof value === "object" && Number.isSafeInteger(value.length)
   }
 
   function isNative(value){
@@ -479,7 +488,6 @@ var haigeno1 = (function(){
   function isPlainObject(value){
     return value.constructor === null || value.constructor.name === "Object" 
   }  
-  //??
   function isFinite(value){
     return Number.isFinite(value)
   }
@@ -496,6 +504,10 @@ var haigeno1 = (function(){
     return value instanceof Node
   }
 
+  function isFloat(value){
+    return parseFloat(value)-value === 0
+  }
+
 
   function lt(val,other){
     return val < other
@@ -506,11 +518,11 @@ var haigeno1 = (function(){
   }
 
   function toArray(val){
-    var res = []
-    for (var i in val){
-      res.push(val[i])
+    if(!isNil(val)){
+      return Object.values(val)
+    } else {
+      return []
     }
-    return res
   }
 
   function toFinite(val){
@@ -535,95 +547,131 @@ var haigeno1 = (function(){
   }
 
   function toLength(val){
-    if(value >= 4294967295)
-      return 4294967295
-    if(value < 0)
-      return 0
-    return Math.floor(value)
+    var res = toInteger(val) < 0 ? 0 : toInteger(val)
+    return res < 4294967295 ? res : 4294967295
   }
 
   function toNumber(val){
     return Number(val)
   }
 
-  function assign(val){
-    
+  function assigIn(object, ...sources){
+    return sources.reduce((acc, cur, key) => {
+        for (var key in cur) {acc[key] = cur[key]}
+        return acc
+    }, object)
   }
 
-  function toSafeInteger(val){
-    
+  function toSafeInteger(number) {
+      if (number > Number.MAX_SAFE_INTEGER) {
+        return Number.MAX_SAFE_INTEGER
+      }
+      if (number < Number.MIN_SAFE_INTEGER) {
+        return Number.MIN_SAFE_INTEGER
+      } 
+      if(isNil(number)){
+        return 0
+      }     
+      return parseInt(number)
   }
 
-  function add(val){
-    
+  function add(augend, addend){
+    return augend+addend
   }
 
-  function ceil(val){
-    
+  function ceil(number, precision=0){
+    return Math.ceil(number * 10 ** precision) / 10 ** precision
   }
 
-  function divide(val){
-    
+  function divide(dividend, divisor){
+    return dividend / divisor
   }
 
-  function floor(val){
-    
+  function floor(number, precision=0){
+    return Math.floor(number * 10 ** precision) / 10 ** precision
   }
 
-  function max(val){
-    
+  function max(array){
+    return array && array.length ? Math.max(...array) : undefined
   }
 
-  function maxBy(val){
-    
+  function maxBy(array,iter= identity){
+    iter = iteratee(iter)
+    return array.reduce((res,item,i,array) => {
+      res = iter(res) > iter(item) ? res : item 
+      return res
+    })
   }
 
-  function mean(val){
-    
+  function sumBy(array,iteratee=identity){
+    var res = 0
+    for (var i=0; i < array.length; i++){
+      res += iteratee(i)
+    }
+    return res
   }
 
-  function meanBy(val){
-    
+  function sum(array){
+    return sumBy(array,identity)
+  }    
+
+  function mean(array){
+    return meanBy(array,identity)
   }
 
-  function min(val){
-    
+  function meanBy(array,iter= identity){
+    if(array.length === 0){
+      return 0
+    }
+    return sumBy(iter) / array.length
   }
 
-  function minBy(val){
-    
+  function min(array){
+    return array && array.length ? Math.min(...array) : undefined
   }
 
-  function multiply(val){
-    
+  function minBy(array, iter =identity){
+    return sortBy(array,iter).shift()
   }
 
-  function round(val){
-    
+  function multiply(multiplier, multiplicand){
+    return multiplier * multiplicand
   }
 
-  function subtract(val){
-    
+  function round(number, precision=0){
+    return Math.round(number * 10 ** precision) / 10 ** precision
   }
 
-  function sum(val){
-    
+  function subtract(minuend, subtrahend){
+    return minuend - subtrahend
   }
 
-  function sumBy(val){
-    
+  function clamp(number,...args){
+    var upper = args.pop()
+    var lower = args.pop()===undefined ? number : args.pop()
+    if (number > upper) return upper
+    if (number < lower) return lower
+    return number
   }
 
-  function clamp(val){
-    
+  function inRange(number, start, end){
+    if (end === undefined) {
+        end = start
+        start = 0
+    }
+    if (start > end)[start, end] = [end, start]
+    return start <= number && number < end
   }
 
-  function inRange(val){
-    
-  }
-
-  function random(val){
-    
+  function random(lower=0, upper=1, floating=false){
+    if (isFloat(lower) || isFloat(upper)){
+      floating = true
+    }
+    var res = Math.random() * (upper - lower) + lower
+    if (!floating){
+      return parseInt(res)
+    }
+    return res
   }
 
   function assignIn(val){
@@ -651,7 +699,7 @@ var haigeno1 = (function(){
     return res
   }
 
-  function dropWhile(array, predicate=_.identity) {
+  function dropWhile(array, predicate=identity) {
     predicate = iteratee(predicate)
     for (var i = 0; i < array.length; i++){
       if (!predicate(array[i],i,array)){
@@ -661,7 +709,7 @@ var haigeno1 = (function(){
     return []
   }
 
-  function dropRightWhile(array, predicate=_.identity){
+  function dropRightWhile(array, predicate=identity){
     predicate = iteratee(predicate)
     for (var i = array.length-1; i >= 0; i--){
       if (!predicate(array[i])){
@@ -729,7 +777,7 @@ var haigeno1 = (function(){
   function flattenDepth(array, depth=1){
     var tmp = array
     while(depth--){
-      var tmp = haigeno1.flatten(tmp)
+      var tmp = flatten(tmp)
     }
     return tmp
   }
@@ -772,25 +820,14 @@ var haigeno1 = (function(){
     return res
   }
 
-  function map (array,mapper){
-    if (typeof mapper == "string") {
-      mapper = haigeno1.property(mapper)
-    }
-    var res = []
-    for (var i = 0; i < array.length; i++){
-      res.push(mapper(array[i]))
-    }
-    return res
-  }
-
-  function map2(array, mapper) {
-    return Array.reduce(function(result, item, index, ary) {
-      result.push(mapper(item, index, ary))
-      return result
+  function map(collection,iter=identity){
+    iter = iteratee(iter)
+    return collection.reduce((result,item,index,collection) => {
+      return result.push(iter(item,index,collection))
     },[])
   }
 
-  function reduce(collection,reducer=haigeno1.identity,accumulator){
+  function reduce(collection,reducer=identity,accumulator){
     var keys = Object.keys(collection)
     var values = Object.values(collection)
     if (accumulator === undefined){
@@ -816,17 +853,17 @@ var haigeno1 = (function(){
     return accumulator    
   }
 
-  function filter(array,test){
-    test = iteratee(test)
-    return array.reduce((result, item, index, ary) => {
-      if (test(item, index, ary)) {
-        result.push(item)
+  function filter(collection,predicate=identity){
+    predicate = iteratee(predicate)
+    return collection.reduce((res,item,i,collection) => {
+      if(predicate(item,i,collection)){
+        res.push(item)
       }
-      return result
+      return res
     },[])
   }
 
-  function forEach(collection, it=_.identity){
+  function forEach(collection, it=identity){
     var action = iteratee(it)
     for (var i in collection){
       if (action(collection[i],i,collection) === false){
@@ -836,7 +873,7 @@ var haigeno1 = (function(){
     return collection
   }
 
-  function forEachRight(collection, it=_.identity){
+  function forEachRight(collection, it=identity){
     var action = iteratee(it)
     var arrKeys = Object.keys(collection)
     var len = arrKeys.length
@@ -915,17 +952,6 @@ var haigeno1 = (function(){
 
   }
 
-  function sumBy(array,iteratee=_.identity){
-    var res = 0
-    for (var i of array){
-      res += iteratee(i)
-    }
-    return res
-  }
-
-  function sum(array){
-    return haigeno1.sumBy(array,haigeno1.identity)
-  }
 
   function property(path){
     return function(obj){
@@ -934,10 +960,6 @@ var haigeno1 = (function(){
   }
 
   function matchesProperty(path, srcValue){
-    if (Array.isArray(path)){
-        path = path[0]
-        srcValue = path[1]
-    }
     return function(obj){
       return get(obj,path) === srcValue
     }
@@ -1066,8 +1088,8 @@ var haigeno1 = (function(){
     }
   }
 
-  function every(collection, predicate=_.identity){
-    predicate = _.iteratee(predicate)
+  function every(collection, predicate=identity){
+    predicate = iteratee(predicate)
     for (var val of collection){
       if(!predicate(val)){
         return false
@@ -1076,8 +1098,8 @@ var haigeno1 = (function(){
     return true
   }
 
-  function some(collection, predicate=_.identity){
-    predicate = _.iteratee(predicate)
+  function some(collection, predicate=identity){
+    predicate = iteratee(predicate)
     for (var val of collection){
       if (predicate(val)){
         return true
@@ -1086,7 +1108,7 @@ var haigeno1 = (function(){
     return false
   }
 
-  function iteratee(func=_.identity){
+  function iteratee(func=identity){
     var type = getType(func)
     if (type === 'Function') {
         return func
@@ -1102,7 +1124,7 @@ var haigeno1 = (function(){
 
   function method(path,...args){
     return function(obj){
-      return haigeno1.get(obj,path)(...args)
+      return get(obj,path)(...args)
     }
   }
 
@@ -1135,10 +1157,56 @@ var haigeno1 = (function(){
     return value.toString().split("[").join(".").split("]").join("").split(".")
   }
 
+  function constant(value){
+    return value
+  }
+
+  function times(n,iteratee=identity){
+    var res = []
+    for (var i = 0; i < n; i++){
+      res.push(iteratee(i))
+    }
+    return res
+  }
+
+  function tail(array){
+    return array.slice(1)
+  }
+
+  function take(array,n=1){
+    return array.slice(0,n)
+  }
+
+  function takeRight(array,n=1){
+    if(n > array.length){
+      return array
+    }
+    return array.slice(array.length-n)
+  }
+
+  function takeWhile(array,predicate=identity){
+    predicate = iteratee(predicate)
+    for (var i = 0; i < array.length; i++){
+      if(!predicate(array[i],i,array)){
+        return array.slice(0,i)
+      }
+    }
+    return array
+  }
+
+  function takeRightWhile(array,predicate=identity){
+    predicate = iteratee(predicate)
+    for(var i = array.length; i >=0; i++){
+      if(!predicate(array[i],i,array)){
+        return array.slice(i)
+      }
+    }
+    return array
+  }
   
 
-  function find(collection, predicate=_.identity, fromIndex=0){
-    predicate = _.iteratee(predicate)
+  function find(collection, predicate=identity, fromIndex=0){
+    predicate = iteratee(predicate)
     for (var i = fromIndex ; i < collection.length; i++){
       if (predicate(collection[i])){
         return collection[i]
@@ -1146,8 +1214,8 @@ var haigeno1 = (function(){
     }
   }
 
-  function findIndex(array, predicate=_.identity, fromIndex=0){
-    predicate = _.iteratee(predicate)
+  function findIndex(array, predicate=identity, fromIndex=0){
+    predicate = iteratee(predicate)
     for (var i = fromIndex ; i < array.length; i++){
       if (predicate(array[i])){
         return i
@@ -1156,8 +1224,8 @@ var haigeno1 = (function(){
     return -1
   }
 
-  function findLastIndex(array, predicate=_.identity, fromIndex=array.length-1){
-    predicate = _.iteratee(predicate)
+  function findLastIndex(array, predicate=identity, fromIndex=array.length-1){
+    predicate = iteratee(predicate)
     for (var i = fromIndex ; i >= 0; i--){
       if (predicate(array[i])){
         return i
@@ -1201,7 +1269,7 @@ var haigeno1 = (function(){
     return Array.from(new Set(array))
   }œ
 
-  function uniqBy(array, predicate=_.identity){
+  function uniqBy(array, predicate=identity){
     var prep = iteratee(predicate)
     var res = [] 
     array.forEach(i => res.some(j => prep(j)===prep(i)) ? res :res.push(i))
@@ -1285,8 +1353,8 @@ var haigeno1 = (function(){
     return array    
   }
 
-  function pullAllBy(array, values, predicate=_.identity){
-    var prep = haigeno1.iteratee(predicate)
+  function pullAllBy(array, values, predicate=identity){
+    var prep = iteratee(predicate)
     var values1 = values.map(prep)
     for (var i = 0; i < array.length; i++){
       if (values1.includes(prep(array[i]))){
@@ -1389,9 +1457,9 @@ var haigeno1 = (function(){
   //     for (var key in src){
   //       if (object[key] === undefined){
   //         object[key] = src[key]
-  //       } else if (_.isObject(object[key]) && _.isObject(src[key])){
+  //       } else if (isObject(object[key]) && isObject(src[key])){
   //         merge (object[key],src[key])
-  //       } else if (_.isArray(object[key]) && _.isArray(src[key])){
+  //       } else if (isArray(object[key]) && isArray(src[key])){
   //         object[key].forEach(i => src[key].forEach(j => merge(i,j)))
   //       } 
   //     }
@@ -1407,7 +1475,7 @@ var haigeno1 = (function(){
         } else {
           if (Array.isArray(object[key]) && Array.isArray(source[key])){
             merge(object[key],source[key])
-          } else if (_.isObject(object[key]) && _.isObject(source[key])){
+          } else if (isObject(object[key]) && isObject(source[key])){
             merge(object[key],source[key])
           }
         }
@@ -1702,8 +1770,6 @@ var haigeno1 = (function(){
       }
     }
 
-
-
   }
 
 
@@ -1757,12 +1823,11 @@ var haigeno1 = (function(){
   }
 
   function flow(...funcs){
-    var fs = Array.slice.call(funcs)
+    var fs = Array.prototype.slice.call(funcs)
     return function(...args){
-      return fs.reduce((res,f)=> f(res),args)
+      return fs.reduce((res,f)=> f(res),fs.shift()(...args))
     }
   }
-
 
   function curry(func,len=func.length){
     return function(...args){
@@ -1794,6 +1859,10 @@ var haigeno1 = (function(){
         lastTime = now
       }
     }
+  }
+
+  function invoke(object, path,...args){
+
   }
 
   
