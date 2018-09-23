@@ -959,9 +959,11 @@ var haigeno1 = (function(){
 
   function isMatch(object,source){
     for (var key in source){
-      if (object[key] !== source[key]){
-        return false
-      } 
+      if (source.hasOwnProperty(key)){
+        if (object[key] !== source[key]){
+          return false
+        } 
+      }
     }
     return true
   }
