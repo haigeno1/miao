@@ -346,7 +346,7 @@ var haigeno1 = (function(){
 
 
   function isEmpty(obj){
-    for (let i in ){
+    for (let i in obj){
       return false
     }
     return true
@@ -477,7 +477,7 @@ var haigeno1 = (function(){
   }
 
   function isPlainObject(value){
-    return value.constructor === null || value.constructor.name = "Object" 
+    return value.constructor === null || value.constructor.name === "Object" 
   }  
   //??
   function isFinite(value){
@@ -654,7 +654,7 @@ var haigeno1 = (function(){
   function dropWhile(array, predicate=_.identity) {
     predicate = iteratee(predicate)
     for (var i = 0; i < array.length; i++){
-      if (!predicate(array[i])){
+      if (!predicate(array[i],i,array)){
         return array.slice(i)
       }
     }
@@ -946,8 +946,11 @@ var haigeno1 = (function(){
   function matches(source){
     return function(obj){
       for (var key in source){
-        if(obj[key] !== source[key]){
-          return false
+        if (source.hasOwnProperty(key)){
+          //is deep equal
+          if(obj[key] !== source[key]){
+            return false
+          }
         }
       }
       return true
